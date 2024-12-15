@@ -1,0 +1,82 @@
+[project]
+name = "eloy"
+description = ""
+authors = [{ name = "Lionel Garcia", email = "" }]
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT License" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+version = "0.0.1"
+dependencies = [
+    "numpy",
+    "scikit-image",
+    "astropy",
+    "photutils",
+    "twirl",
+    "scipy",
+]
+
+[project.urls]
+"Homepage" = ""
+"Source" = "https://github.com/exoplanet-dev/eloy"
+"Bug Tracker" = "https://github.com/lgrcia/eloy/issues"
+
+[project.optional-dependencies]
+dev = [
+    "nox",
+    "ruff",
+    "black",
+    "pre-commit",
+    "pytest",
+]
+test = ["pytest", "pytest-xdist"]
+docs = [
+    "matplotlib",
+    "myst-nb",
+    "sphinx-book-theme",
+    "sphinx-design",
+    "sphinx-autoapi<3.2.0",
+    "ipywidgets",
+]
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/eloy/eloy_version.py"
+
+[tool.black]
+target-version = ["py310"]
+line-length = 88
+
+[tool.ruff]
+line-length = 89
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["F", "I", "E", "W", "YTT", "B", "Q", "PLE", "PLR", "PLW", "UP"]
+ignore = [
+    "B023",    # Allow using global variables in lambdas
+    "E741",    # Allow ambiguous variable names
+    "PLR0912", # Allow many branches
+    "PLR0913", # Allow many arguments in function call
+    "PLR0915", # Allow many statements
+    "PLR2004", # Allow magic numbers in comparisons
+]
+# exclude = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["eloy"]
+combine-as-imports = true
