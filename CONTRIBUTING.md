@@ -6,13 +6,13 @@ requests, and pull requests.
 
 Here is a list of important resources for contributors:
 
-- [Source Code](https://github.com/exoplanet-dev/eloy)
+- [Source Code](https://github.com/lgrcia/eloy)
 - [Documentation](https://jax.exoplanet.codes)
-- [Issue Tracker](https://github.com/exoplanet-dev/eloy/issues)
+- [Issue Tracker](https://github.com/lgrcia/eloy/issues)
 
 ## How to report a bug
 
-Report bugs on the [Issue Tracker](https://github.com/exoplanet-dev/eloy/issues).
+Report bugs on the [Issue Tracker](https://github.com/lgrcia/eloy/issues).
 
 When filing an issue, make sure to answer these questions:
 
@@ -29,7 +29,7 @@ Example](https://stackoverflow.com/help/minimal-reproducible-example).
 ## How to request a feature
 
 Feel free to request features on the [Issue
-Tracker](https://github.com/exoplanet-dev/eloy/issues).
+Tracker](https://github.com/lgrcia/eloy/issues).
 
 ## How to test the project
 
@@ -40,4 +40,4 @@ python -m nox -s test
 
 ## How to submit changes
 
-Open a [Pull Request](https://github.com/exoplanet-dev/eloy/pulls).
+Open a [Pull Request](https://github.com/lgrcia/eloy/pulls).

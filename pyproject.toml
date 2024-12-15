@@ -26,7 +26,7 @@ dependencies = [
 
 [project.urls]
 "Homepage" = ""
-"Source" = "https://github.com/exoplanet-dev/eloy"
+"Source" = "https://github.com/lgrcia/eloy"
 "Bug Tracker" = "https://github.com/lgrcia/eloy/issues"
 
 [project.optional-dependencies]
