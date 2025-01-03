@@ -14,7 +14,7 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-version = "0.0.1"
+version = "0.0.1b"
 dependencies = [
     "numpy",
     "scikit-image",
@@ -30,13 +30,7 @@ dependencies = [
 "Bug Tracker" = "https://github.com/lgrcia/eloy/issues"
 
 [project.optional-dependencies]
-dev = [
-    "nox",
-    "ruff",
-    "black",
-    "pre-commit",
-    "pytest",
-]
+dev = ["nox", "ruff", "black", "pre-commit", "pytest"]
 test = ["pytest", "pytest-xdist"]
 docs = [
     "matplotlib",
