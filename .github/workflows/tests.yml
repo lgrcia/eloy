@@ -92,7 +92,7 @@ jobs:
   publish:
     environment:
       name: pypi
-      url: https://pypi.org/p/package_name
+      url: https://pypi.org/p/eloy
     permissions:
       id-token: write
     needs: [tests, build]
