@@ -14,7 +14,7 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-version = "0.0.3b"
+version = "0.0.4b"
 dependencies = [
     "numpy",
     "scikit-image",
