@@ -13,12 +13,17 @@ def photutils_centroid(data, coords, cutout=21, centroid_fun=None):
     if centroid_fun is None:
         centroid_fun = default_centroid_func
 
-    x, y = coords.T.copy()
+    in_image = np.all(coords < np.array(data.shape[::-1]) - (1, 1), axis=1)
+    in_image = np.logical_and(in_image, np.all(coords > (0, 0), axis=1))
+
+    x, y = coords[in_image].T.copy()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", AstropyUserWarning)
-        centroid_coords = np.array(
+        in_image_centroid_coords = np.array(
             centroid_sources(data, x, y, box_size=cutout, centroid_func=centroid_fun)
         ).T
+    centroid_coords = coords.copy()
+    centroid_coords[in_image] = in_image_centroid_coords
     idxs = np.flatnonzero(~np.all(np.isfinite(centroid_coords), 1))
     centroid_coords[idxs] = coords[idxs]
     return centroid_coords
