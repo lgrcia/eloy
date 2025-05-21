@@ -69,7 +69,6 @@ def plot_marks(
 
     for _x, _y, _label in zip(x, y, label):
         circle = patches.Circle((_x, _y), ms, fill=None, ec=color, alpha=alpha)
-        ax = plt.gca()
         ax.add_artist(circle)
         f = 5
         if _label is not None:

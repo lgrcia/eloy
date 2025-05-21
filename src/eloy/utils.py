@@ -66,3 +66,12 @@ def binned_nanstd(x, bins: int = 12):
         )
 
     return compute
+
+
+def fake_image(shape=50, seed=0, stars=30):
+    np.random.seed(seed)
+    image = np.zeros((shape, shape))
+    coords = (np.random.rand(2, stars) * shape).astype(int).T
+    for i, j in coords:
+        image[j, i] = 1.0
+    return image, coords
