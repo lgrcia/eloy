@@ -12,11 +12,11 @@ def divisors(n):
     return np.array(_divisors)
 
 
-def easy_median(images):
+def easy_median(images, m=50):
     # To avoid memory errors, we split the median computation in 50
     images = np.array(images)
     shape_divisors = divisors(images.shape[1])
-    n = shape_divisors[np.argmin(np.abs(50 - shape_divisors))]
+    n = shape_divisors[np.argmin(np.abs(m - shape_divisors))]
     return np.concatenate(
         [np.nanmedian(im, axis=0) for im in np.split(images, n, axis=1)]
     )
