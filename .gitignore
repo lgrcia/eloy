@@ -20,3 +20,5 @@ dev/*
 _docs
 jupyter_execute
 __pycache__
+_docs
+*.f*t*
