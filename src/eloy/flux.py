@@ -1,3 +1,10 @@
+"""
+Differential photometry and flux optimization routines.
+
+This module provides functions for computing differential fluxes,
+optimizing comparison star weights, and selecting optimal flux indices.
+"""
+
 import numpy as np
 from eloy import utils
 
@@ -5,23 +12,24 @@ from eloy import utils
 def weights(
     fluxes: np.ndarray, tolerance: float = 1e-3, max_iteration: int = 200, bins: int = 5
 ):
-    """Returns the weights computed using Broeg 2005
+    """
+    Returns the weights computed using Broeg 2005.
 
     Parameters
     ----------
     fluxes : np.ndarray
-        fluxes matrix with dimensions (star, flux) or (aperture, star, flux)
+        Fluxes matrix with dimensions (star, flux) or (aperture, star, flux).
     tolerance : float, optional
-        the minimum standard deviation of weights difference to attain (meaning weights are stable), by default 1e-3
+        Minimum standard deviation of weights difference to attain (weights are stable).
     max_iteration : int, optional
-        maximum number of iterations to compute weights, by default 200
+        Maximum number of iterations to compute weights.
     bins : int, optional
-        binning size (in number of points) to compute the white noise, by default 5
+        Binning size (in number of points) to compute the white noise.
 
     Returns
     -------
     np.ndarray
-        Broeg weights
+        Broeg weights.
     """
 
     # normalize
@@ -63,21 +71,22 @@ def weights(
 
 
 def diff(fluxes: np.ndarray, weights: np.ndarray = None):
-    """Returns differential fluxes.
+    """
+    Returns differential fluxes.
 
-    If weights are specified, they are used to produce an artificial light curve by which all flux are differentiated (see Broeg 2005)
+    If weights are specified, they are used to produce an artificial light curve by which all flux are differentiated (see Broeg 2005).
 
     Parameters
     ----------
     fluxes : np.ndarray
-        fluxes matrix with dimensions (star, flux) or (aperture, star, flux)
-    weights :np.ndarray, optional
-        weights matrix with dimensions (star) or (aperture, star), by default None which simply returns normalized fluxes
+        Fluxes matrix with dimensions (star, flux) or (aperture, star, flux).
+    weights : np.ndarray, optional
+        Weights matrix with dimensions (star) or (aperture, star).
 
     Returns
     -------
     np.ndarray
-        Differential fluxes if weights is provided, else normalized fluxes
+        Differential fluxes if weights is provided, else normalized fluxes.
     """
     diff_fluxes = fluxes / np.expand_dims(np.nanmean(fluxes, -1), -1)
     if weights is not None:
@@ -93,6 +102,21 @@ def diff(fluxes: np.ndarray, weights: np.ndarray = None):
 
 
 def auto_diff_1d(fluxes, i=None):
+    """
+    Automatically compute differential fluxes and optimal weights for 1D flux array.
+
+    Parameters
+    ----------
+    fluxes : np.ndarray
+        Fluxes array.
+    i : int or None, optional
+        Index of the target star.
+
+    Returns
+    -------
+    tuple
+        Tuple (differential fluxes, weights).
+    """
     dfluxes = fluxes / np.expand_dims(np.nanmean(fluxes, -1), -1)
     w = weights(dfluxes)
     if i is not None:
@@ -125,6 +149,21 @@ def auto_diff_1d(fluxes, i=None):
 
 
 def auto_diff(fluxes: np.array, i: int = None):
+    """
+    Automatically compute differential fluxes and optimal weights for 2D or 3D flux array.
+
+    Parameters
+    ----------
+    fluxes : np.ndarray
+        Fluxes array.
+    i : int or None, optional
+        Index of the target star.
+
+    Returns
+    -------
+    tuple or tuple of arrays
+        Differential fluxes and weights.
+    """
     if fluxes.ndim == 3:
         auto_diffs = [auto_diff_1d(f, i) for f in fluxes]
         w = [a[1] for a in auto_diffs]
@@ -135,6 +174,23 @@ def auto_diff(fluxes: np.array, i: int = None):
 
 
 def optimal_flux(diff_fluxes, method="stddiff", sigma=4):
+    """
+    Select the optimal flux index based on a given criterion.
+
+    Parameters
+    ----------
+    diff_fluxes : np.ndarray
+        Differential fluxes array.
+    method : str, optional
+        Criterion method: "binned", "stddiff", or "stability".
+    sigma : float, optional
+        Sigma clipping threshold.
+
+    Returns
+    -------
+    int
+        Index of the optimal flux.
+    """
     fluxes = diff_fluxes.copy()
     fluxes = fluxes[
         ...,

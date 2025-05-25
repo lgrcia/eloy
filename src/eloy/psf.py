@@ -1,3 +1,10 @@
+"""
+Point Spread Function (PSF) modeling utilities.
+
+This module provides functions for estimating PSF parameters using image moments
+and fitting 2D Gaussian models to image data.
+"""
+
 from scipy.optimize import minimize
 import numpy as np
 
@@ -5,6 +12,19 @@ gaussian_sigma_to_fwhm = 2.0 * np.sqrt(2.0 * np.log(2.0))
 
 
 def moments(data):
+    """
+    Estimate the moments of a 2D distribution.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        2D image data.
+
+    Returns
+    -------
+    dict
+        Dictionary of estimated parameters: amplitude, x, y, sigma_x, sigma_y, background, theta, beta.
+    """
     height = data.max()
     background = data.min()
     data = data - np.min(data)
@@ -31,6 +51,21 @@ def moments(data):
 
 
 def fit_gaussian(data, init=None):
+    """
+    Fit a 2D Gaussian to the data.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        2D image data.
+    init : dict or None, optional
+        Initial parameter estimates.
+
+    Returns
+    -------
+    dict
+        Dictionary of fitted parameters: amplitude, x, y, sigma_x, sigma_y, theta, background.
+    """
     x, y = np.indices(data.shape)
 
     def model(height, xo, yo, sx, sy, theta, m):

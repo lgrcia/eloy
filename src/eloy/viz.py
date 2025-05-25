@@ -1,3 +1,10 @@
+"""
+Visualization utilities for astronomical images.
+
+This module provides functions for image scaling and for plotting
+marks and labels on matplotlib axes.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import patches
@@ -5,6 +12,21 @@ from astropy.visualization import ZScaleInterval
 
 
 def z_scale(data, c=0.05):
+    """
+    Compute z-scale interval for image display.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        2D image data.
+    c : float, optional
+        Contrast parameter for ZScaleInterval.
+
+    Returns
+    -------
+    tuple
+        (vmin, vmax) for display scaling.
+    """
     interval = ZScaleInterval(contrast=c)
     return interval(data.copy())
 
@@ -23,6 +45,40 @@ def plot_marks(
     alpha=1,
     ax=None,
 ):
+    """
+    Plot circular marks and optional labels on a matplotlib axis.
+
+    Parameters
+    ----------
+    x : array-like
+        X coordinates.
+    y : array-like
+        Y coordinates.
+    label : array-like or None, optional
+        Labels for each mark.
+    position : str, optional
+        Position of the label ("top" or "bottom").
+    offset : float, optional
+        Offset for label position.
+    fontsize : int, optional
+        Font size for labels.
+    color : list or str, optional
+        Color for marks and labels.
+    ms : float, optional
+        Marker size.
+    n : int or None, optional
+        Number of marks to plot.
+    inside : bool, optional
+        Only plot marks inside axis limits.
+    alpha : float, optional
+        Alpha transparency.
+    ax : matplotlib.axes.Axes or None, optional
+        Axis to plot on.
+
+    Returns
+    -------
+    None
+    """
     y_offset = ms + offset
 
     if position == "top":

@@ -1,3 +1,10 @@
+"""
+Centroiding utilities for astronomical images.
+
+This module provides functions to compute centroids of sources in images
+using photutils, with robust handling of edge cases.
+"""
+
 from photutils.centroids import (
     centroid_quadratic,
     centroid_sources,
@@ -10,6 +17,25 @@ default_centroid_func = centroid_quadratic
 
 
 def photutils_centroid(data, coords, cutout=21, centroid_fun=None):
+    """
+    Compute centroids for a list of coordinates using photutils.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        2D image data.
+    coords : np.ndarray
+        Array of (x, y) coordinates.
+    cutout : int, optional
+        Size of the cutout box for centroiding.
+    centroid_fun : callable or None
+        Centroiding function to use.
+
+    Returns
+    -------
+    np.ndarray
+        Array of centroid coordinates.
+    """
     if centroid_fun is None:
         centroid_fun = default_centroid_func
 

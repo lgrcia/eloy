@@ -1,3 +1,8 @@
+"""
+This package provides modules for calibration, detection, alignment,
+centroiding, photometry, PSF modeling, and utility functions.
+"""
+
 __all__ = [
     "calibration",
     "detection",
