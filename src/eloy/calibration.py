@@ -57,8 +57,36 @@ def easy_median(images, m=50):
     )
 
 
-default_fun_load = lambda file: fits.open(file)[0].data
-default_fun_exp = lambda file: fits.open(file)[0].header["EXPTIME"]
+def default_fun_load(file):
+    """The default function to load image data from a file.
+
+    Parameters
+    ----------
+    file : str or Path
+        Path to the file to load.
+
+    Returns
+    -------
+    np.ndarray
+        Loaded image data.
+    """
+    return fits.open(file)[0].data
+
+
+def default_fun_exp(file):
+    """The default function to extract exposure time from a file.
+
+    Parameters
+    ----------
+    file : str or Path
+        Path to the file to extract exposure time from.
+
+    Returns
+    -------
+    float
+        Exposure time extracted from the file header.
+    """
+    return fits.open(file)[0].header["EXPTIME"]
 
 
 def master_dark(bias=None, files=None, fun_load=None, fun_exp=None):
@@ -74,7 +102,7 @@ def master_dark(bias=None, files=None, fun_load=None, fun_exp=None):
     fun_load : callable or None
         Function to load image data from file.
     fun_exp : callable or None
-        Function to extract exposure time from file.
+        Function to extract exposure time from file. Default is :func:`default_fun_exp`
 
     Returns
     -------
@@ -115,9 +143,9 @@ def master_flat(bias=None, dark=None, files=None, fun_load=None, fun_exp=None):
     files : list or None
         List of file paths to flat frames.
     fun_load : callable or None
-        Function to load image data from file.
+        Function to load image data from file. Default is :func:`default_fun_load`
     fun_exp : callable or None
-        Function to extract exposure time from file.
+        Function to extract exposure time from file. Default is :func:`default_fun_exp`
 
     Returns
     -------
@@ -158,7 +186,7 @@ def master_bias(files=None, fun_load=None):
     files : list or None
         List of file paths to bias frames.
     fun_load : callable or None
-        Function to load image data from file.
+        Function to load image data from file. Default is :func:`default_fun_load`
 
     Returns
     -------
