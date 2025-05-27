@@ -26,6 +26,7 @@ calibration
 stacking
 video
 plate-solving
+target
 photometry
 ```
 
@@ -33,7 +34,6 @@ photometry
 :caption: Developer Documentation
 :maxdepth: 1
 
-api
 contributing
 glossary
 
