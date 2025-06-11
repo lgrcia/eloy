@@ -32,6 +32,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["nox", "ruff", "black", "pre-commit", "pytest"]
 test = ["pytest", "pytest-xdist"]
+jax = ["flax", "optax", "huggingface_hub"]
 docs = [
     "matplotlib",
     "myst-nb",
