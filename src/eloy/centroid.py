@@ -12,6 +12,7 @@ from photutils.centroids import (
 import warnings
 from astropy.utils.exceptions import AstropyUserWarning
 import numpy as np
+from eloy import utils
 
 default_centroid_func = centroid_quadratic
 
@@ -53,3 +54,25 @@ def photutils_centroid(data, coords, cutout=21, centroid_fun=None):
     idxs = np.flatnonzero(~np.all(np.isfinite(centroid_coords), 1))
     centroid_coords[idxs] = coords[idxs]
     return centroid_coords
+
+
+def ballet_centroid(data, coords, cnn):
+    """
+    Compute centroids for sources using a CNN-based model.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        2D image data.
+    coords : np.ndarray
+        Array of (x, y) coordinates for sources.
+    cnn : object
+        CNN model with a `centroid` method that accepts cutouts.
+
+    Returns
+    -------
+    np.ndarray
+        Array of refined centroid coordinates.
+    """
+    cutouts = utils.cutout(data, coords, (15, 15))
+    return coords - 15 / 2 + cnn.centroid(cutouts)

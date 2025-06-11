@@ -34,6 +34,7 @@ photometry
 :caption: Developer Documentation
 :maxdepth: 1
 
+ballet
 contributing
 glossary
 
