@@ -5,15 +5,35 @@ except:
     pass
 
 import numpy as np
-from pathlib import Path
-import requests
 
 
 class CNN(nn.Module):
+    """
+    Convolutional Neural Network for centroid regression.
+
+    Attributes
+    ----------
+    params : None
+        Placeholder for model parameters.
+    """
+
     params: None = None
 
     @nn.compact
     def __call__(self, x):
+        """
+        Forward pass of the CNN.
+
+        Parameters
+        ----------
+        x : jax.numpy.ndarray
+            Input image batch of shape (batch, height, width, channels).
+
+        Returns
+        -------
+        jax.numpy.ndarray
+            Output predictions of shape (batch, 2).
+        """
         x = x - jnp.min(x, axis=(1, 2, 3), keepdims=True)  # Center input
         x = x / jnp.max(x, axis=(1, 2, 3), keepdims=True)  # Normalize input
         x = nn.Conv(64, (3, 3), padding="SAME")(x)
@@ -33,6 +53,19 @@ class CNN(nn.Module):
 
 
 def load_weights_file(file):
+    """
+    Load model weights from a .npz file.
+
+    Parameters
+    ----------
+    file : str or Path
+        Path to the .npz weights file.
+
+    Returns
+    -------
+    dict
+        Dictionary mapping layer names to their kernel and bias arrays.
+    """
 
     weights = np.load(file)
     layers = np.unique(
@@ -49,16 +82,44 @@ def load_weights_file(file):
 
 
 def download_weights():
+    """
+    Download pretrained weights from HuggingFace Hub.
+
+    Returns
+    -------
+    str
+        Path to the downloaded weights file.
+    """
     from huggingface_hub import hf_hub_download
 
     return hf_hub_download(repo_id="lgrcia/ballet", filename="centroid_15x15.npz")
 
 
 class Ballet:
+    """
+    Ballet interface for centroid prediction using a pretrained CNN.
+
+    Attributes
+    ----------
+    cnn : CNN
+        The CNN model instance.
+    params : dict
+        Model parameters loaded from file.
+    """
+
     cnn: None = None
     params: None = None
 
     def __init__(self, model_file=None):
+        """
+        Initialize the Ballet model.
+
+        Parameters
+        ----------
+        model_file : str or Path, optional
+            Path to the model weights file. If None, downloads default weights.
+        """
+
         if model_file is None:
             model_file = download_weights()
 
@@ -66,4 +127,18 @@ class Ballet:
         self.params = load_weights_file(model_file)
 
     def centroid(self, x):
+        """
+        Predict centroids for input images.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            Input images of shape (batch, height, width).
+
+        Returns
+        -------
+        numpy.ndarray
+            Predicted centroids of shape (batch, 2), with coordinates (y, x).
+        """
+
         return self.cnn.apply({"params": self.params}, x[..., None])[:, ::-1]

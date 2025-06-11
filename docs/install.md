@@ -20,6 +20,14 @@ To upgrade to the latest version:
 pip install --upgrade eloy
 ```
 
+```{important}
+To use JAX-related functions (such as the [Ballet](eloy.ballet.model.Ballet) centroiding model) install with 
+
+`pip install --upgrade "eloy[jax]"`
+
+```
+
+
 ## Virtual Environments
 
 ### Why Use Virtual Environments?

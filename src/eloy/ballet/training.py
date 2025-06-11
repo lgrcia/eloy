@@ -1,3 +1,14 @@
+"""
+Training utilities and synthetic data generation for centroid regression.
+
+This module provides:
+    - Moffat2D: a class for generating synthetic 2D Moffat profiles and labels.
+    - Training utilities for JAX/Flax models, including loss computation, batching, and training steps.
+    - Functions for saving and loading model parameters.
+
+Intended for use in training convolutional neural networks to predict centroids from image cutouts.
+"""
+
 import numpy as np
 from tqdm import tqdm
 
@@ -13,7 +24,16 @@ except ImportError:
 
 class Moffat2D:
     """
-    Moffat 2D generator
+    Moffat 2D generator.
+
+    Generates synthetic 2D Moffat profiles for training and testing.
+
+    Parameters
+    ----------
+    cutout_size : int, optional
+        Size of the generated image cutouts (default is 21).
+    **kwargs
+        Additional keyword arguments.
     """
 
     def __init__(self, cutout_size=21, **kwargs):
@@ -24,6 +44,29 @@ class Moffat2D:
         self.x, self.y = np.indices((cutout_size, cutout_size))
 
     def moffat2D_model(self, a, x0, y0, sx, sy, theta, b, beta):
+        """
+        Generate a 2D Moffat profile.
+
+        Parameters
+        ----------
+        a : float
+            Amplitude.
+        x0, y0 : float
+            Center coordinates.
+        sx, sy : float
+            Scale parameters (widths) along x and y.
+        theta : float
+            Rotation angle in radians.
+        b : float
+            Background level.
+        beta : float
+            Moffat beta parameter.
+
+        Returns
+        -------
+        numpy.ndarray
+            2D Moffat profile of shape (cutout_size, cutout_size).
+        """
         # https://pixinsight.com/doc/tools/DynamicPSF/DynamicPSF.html
         dx_ = self.x - x0
         dy_ = self.y - y0
@@ -33,9 +76,42 @@ class Moffat2D:
         return b + a / np.power(1 + (dx / sx) ** 2 + (dy / sy) ** 2, beta)
 
     def sigma_to_fwhm(self, beta):
+        """
+        Convert Moffat beta parameter to FWHM.
+
+        Parameters
+        ----------
+        beta : float
+            Moffat beta parameter.
+
+        Returns
+        -------
+        float
+            Full width at half maximum (FWHM).
+        """
         return 2 * np.sqrt(np.power(2, 1 / beta) - 1)
 
     def random_model_label(self, N=10000, flatten=False, return_all=False, sigma=1.0):
+        """
+        Generate random Moffat images and labels.
+
+        Parameters
+        ----------
+        N : int, optional
+            Number of samples to generate (default is 10000).
+        flatten : bool, optional
+            If True and N==1, returns single image and label (default is False).
+        return_all : bool, optional
+            If True, returns all model parameters as labels (default is False).
+        sigma : float, optional
+            Standard deviation for center coordinates (default is 1.0).
+
+        Returns
+        -------
+        tuple
+            (images, labels) where images is (N, cutout_size, cutout_size, 1)
+            and labels is (N, 2) or (N, 9) depending on return_all.
+        """
 
         images = []
         labels = []
@@ -77,17 +153,54 @@ class Moffat2D:
 
 # --- Training utilities ---
 class TrainState(train_state.TrainState):
+    """
+    Custom TrainState for model training.
+
+    Inherits from flax.training.train_state.TrainState.
+    """
+
     pass
 
 
 def compute_loss(params, batch):
+    """
+    Compute the mean squared error loss for a batch.
+
+    Parameters
+    ----------
+    params : dict
+        Model parameters.
+    batch : tuple
+        Tuple (x, y) of input images and target labels.
+
+    Returns
+    -------
+    jax.numpy.DeviceArray
+        Mean squared error loss.
+    """
     x, y = batch
     preds = model.apply({"params": params}, x)
     return jnp.mean(optax.l2_loss(preds, y))
 
 
 # def compute_loss(params, batch, delta=1.0):
-#     """Robust loss that's less sensitive to outliers than MSE."""
+#     """
+#     Compute the Huber loss for a batch.
+#
+#     Parameters
+#     ----------
+#     params : dict
+#         Model parameters.
+#     batch : tuple
+#         Tuple (x, y) of input images and target labels.
+#     delta : float, optional
+#         Huber loss delta parameter (default is 1.0).
+#
+#     Returns
+#     -------
+#     jax.numpy.DeviceArray
+#         Huber loss.
+#     """
 #     x, y = batch
 #     preds = model.apply({"params": params}, x)
 #     diff = jnp.abs(preds - y)
@@ -97,6 +210,21 @@ def compute_loss(params, batch):
 
 @jax.jit
 def train_step(state, batch):
+    """
+    Perform a single training step.
+
+    Parameters
+    ----------
+    state : TrainState
+        Current training state.
+    batch : tuple
+        Tuple (x, y) of input images and target labels.
+
+    Returns
+    -------
+    tuple
+        (new_state, loss)
+    """
     grad_fn = jax.value_and_grad(compute_loss)
     loss, grads = grad_fn(state.params, batch)
     new_state = state.apply_gradients(grads=grads)
@@ -105,12 +233,40 @@ def train_step(state, batch):
 
 @jax.jit
 def eval_step(params, batch):
+    """
+    Evaluate the model on a batch and compute RMSE.
+
+    Parameters
+    ----------
+    params : dict
+        Model parameters.
+    batch : tuple
+        Tuple (x, y) of input images and target labels.
+
+    Returns
+    -------
+    jax.numpy.DeviceArray
+        Root mean squared error (RMSE).
+    """
     x, y = batch
     preds = model.apply({"params": params}, x)
     return jnp.sqrt(jnp.mean((preds - y) ** 2))  # RMSE
 
 
 def params_to_flat_dict(params):
+    """
+    Flatten model parameters to a dictionary suitable for saving.
+
+    Parameters
+    ----------
+    params : dict
+        Model parameters.
+
+    Returns
+    -------
+    dict
+        Flattened dictionary with keys for each layer's kernel and bias.
+    """
     weights = {}
     for k, v in params.items():
         weights.update(
@@ -121,6 +277,23 @@ def params_to_flat_dict(params):
 
 # --- Data batching ---
 def get_batches(X, y, batch_size):
+    """
+    Yield batches of data for training.
+
+    Parameters
+    ----------
+    X : numpy.ndarray
+        Input images.
+    y : numpy.ndarray
+        Target labels.
+    batch_size : int
+        Batch size.
+
+    Yields
+    ------
+    tuple
+        (x_batch, y_batch) as jax.numpy arrays.
+    """
     indices = np.random.permutation(len(X))
     for start in range(0, len(X), batch_size):
         end = start + batch_size
