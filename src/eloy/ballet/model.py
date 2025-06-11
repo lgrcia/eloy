@@ -1,9 +1,9 @@
 try:
     from flax import linen as nn
+    import jax.numpy as jnp
 except:
     pass
 
-import jax.numpy as jnp
 import numpy as np
 from pathlib import Path
 import requests

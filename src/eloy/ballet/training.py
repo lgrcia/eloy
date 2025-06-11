@@ -1,10 +1,14 @@
 import numpy as np
 from tqdm import tqdm
-from eloy.ballet.model import CNN
-import jax
-import jax.numpy as jnp
-from flax.training import train_state
-import optax
+
+try:
+    from eloy.ballet.model import CNN
+    import jax
+    import jax.numpy as jnp
+    from flax.training import train_state
+    import optax
+except ImportError:
+    pass
 
 
 class Moffat2D:
