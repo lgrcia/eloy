@@ -1,8 +1,11 @@
 try:
     from flax import linen as nn
     import jax.numpy as jnp
-except:
-    pass
+    from huggingface_hub import hf_hub_download
+except ImportError:
+    raise ImportError(
+        'jax-related packages are not installed. Use pip insall "eloy[jax]"'
+    )
 
 import numpy as np
 
@@ -90,7 +93,6 @@ def download_weights():
     str
         Path to the downloaded weights file.
     """
-    from huggingface_hub import hf_hub_download
 
     return hf_hub_download(repo_id="lgrcia/ballet", filename="centroid_15x15.npz")
 
