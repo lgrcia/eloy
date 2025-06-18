@@ -28,6 +28,7 @@ video
 plate-solving
 target
 photometry
+full_pipeline
 ```
 
 ```{toctree}

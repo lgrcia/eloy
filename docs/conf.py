@@ -70,5 +70,5 @@ html_theme_options = {
     "use_sidenotes": True,
 }
 nb_execution_mode = "off"
-nb_execution_excludepatterns = []
+nb_execution_excludepatterns = ["ballet.ipynb"]
 nb_execution_timeout = -1

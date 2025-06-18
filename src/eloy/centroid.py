@@ -13,6 +13,7 @@ import warnings
 from astropy.utils.exceptions import AstropyUserWarning
 import numpy as np
 from eloy import utils
+from eloy.ballet import Ballet
 
 default_centroid_func = centroid_quadratic
 
