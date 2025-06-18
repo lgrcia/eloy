@@ -19,9 +19,10 @@ try:
     from flax.training import train_state
     import optax
 except ImportError:
-    raise ImportError(
-        'jax-related packages are not installed. Use pip insall "eloy[jax]"'
-    )
+    pass
+    # raise ImportError(
+    #     'jax-related packages are not installed. Use pip insall "eloy[jax]"'
+    # )
 
 
 class Moffat2D:

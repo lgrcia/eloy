@@ -3,9 +3,22 @@ try:
     import jax.numpy as jnp
     from huggingface_hub import hf_hub_download
 except ImportError:
-    raise ImportError(
-        'jax-related packages are not installed. Use pip insall "eloy[jax]"'
-    )
+    pass
+
+    # raise ImportError(
+    #     'jax-related packages are not installed. Use pip insall "eloy[jax]"'
+    # )
+    class nn:
+        class Module:
+            def __call__(self, *args, **kwargs):
+                raise NotImplementedError(
+                    "Flax is not installed. Use pip install 'eloy[jax]'"
+                )
+
+        @staticmethod
+        def compact(func):
+            return func
+
 
 import numpy as np
 
