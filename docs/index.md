@@ -32,10 +32,11 @@ full_pipeline
 ```
 
 ```{toctree}
-:caption: Developer Documentation
+:caption: Extra Documentation
 :maxdepth: 1
 
 ballet
+multip
 contributing
 glossary
 
