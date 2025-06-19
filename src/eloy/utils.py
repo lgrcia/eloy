@@ -164,3 +164,39 @@ def fake_image(shape=50, seed=0, stars=30):
     for i, j in coords:
         image[j, i] = 1.0
     return image, coords
+
+
+def share_data(master_files):
+    """
+    Save master calibration arrays to disk as memory-mapped files and return read-only memmap objects.
+
+    This function writes each array in `master_files` to a `.array` file using numpy's memmap,
+    allowing efficient concurrent access from multiple processes. The returned dictionary contains
+    read-only memmap objects for each calibration file.
+
+    Parameters
+    ----------
+    master_files : dict
+        Dictionary mapping string keys (e.g., 'bias', 'dark', 'flat') to numpy.ndarray calibration arrays.
+
+    Returns
+    -------
+    dict
+        Dictionary mapping the same keys to numpy.memmap objects opened in read-only mode.
+    """
+    get_data = {}
+
+    for key, value in master_files.items():
+        shape = value.shape
+        dtype = value.dtype
+        m = np.memmap(f"{key}.array", dtype=dtype, mode="w+", shape=shape)
+        if value.ndim == 2:
+            m[:, :] = value[:, :]
+        else:
+            m[:] = value[:]
+
+        get_data[key] = np.memmap(f"{key}.array", dtype=dtype, mode="r", shape=shape)
+
+    del master_files
+
+    return get_data
