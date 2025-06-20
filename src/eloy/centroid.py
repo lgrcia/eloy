@@ -75,5 +75,5 @@ def ballet_centroid(data, coords, cnn):
     np.ndarray
         Array of refined centroid coordinates.
     """
-    cutouts = utils.cutout(data, coords, (15, 15))
+    cutouts = utils.cutout(data, coords, (15, 15), fill_value=np.median(data))
     return coords - 15 / 2 + cnn.centroid(cutouts)

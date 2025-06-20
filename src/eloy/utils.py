@@ -10,7 +10,7 @@ import numpy as np
 from astropy.nddata import Cutout2D
 
 
-def cutout(data, coords, shape, wcs=None):
+def cutout(data, coords, shape, wcs=None, fill_value=np.nan):
     """
     Extract cutouts from data at given coordinates.
 
@@ -33,7 +33,7 @@ def cutout(data, coords, shape, wcs=None):
     values = []
     for coords in coords:
         cutout = Cutout2D(
-            data, coords, shape, wcs=wcs, fill_value=np.nan, mode="partial"
+            data, coords, shape, wcs=wcs, fill_value=fill_value, mode="partial"
         )
         values.append(cutout.data)
     return np.array(values)
