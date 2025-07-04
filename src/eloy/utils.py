@@ -8,6 +8,7 @@ binning, and generating synthetic images.
 from astropy.nddata import Cutout2D
 import numpy as np
 from astropy.nddata import Cutout2D
+from astropy.nddata.utils import NoOverlapError
 
 
 def cutout(data, coords, shape, wcs=None, fill_value=np.nan):
@@ -31,10 +32,14 @@ def cutout(data, coords, shape, wcs=None, fill_value=np.nan):
         Array of cutout images.
     """
     values = []
+    dummy = np.zeros(shape, dtype=data.dtype)
     for coords in coords:
-        cutout = Cutout2D(
-            data, coords, shape, wcs=wcs, fill_value=fill_value, mode="partial"
-        )
+        try:
+            cutout = Cutout2D(
+                data, coords, shape, wcs=wcs, fill_value=fill_value, mode="partial"
+            )
+        except NoOverlapError:
+            cutout = dummy
         values.append(cutout.data)
     return np.array(values)
 

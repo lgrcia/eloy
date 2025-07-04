@@ -80,7 +80,8 @@ def ballet_centroid(data, coords, cnn, nans=False):
     cutouts = utils.cutout(data, coords, (15, 15), fill_value=np.median(data))
     centroids = np.array(coords - 15 / 2 + cnn.centroid(cutouts))
     if not nans:
-        centroids[np.isnan(centroids)] = coords[np.isnan(centroids)]
+        is_nan = np.isnan(centroids).any(axis=1)
+        centroids[is_nan] = coords[is_nan]
         return centroids
     else:
         return centroids

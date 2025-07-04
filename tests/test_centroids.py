@@ -29,8 +29,8 @@ def test_ballet_nans():
 
     cnn = Ballet()
 
-    im = np.zeros((20, 20))
-    coords = np.array([[10.0, 10.0]])
+    im = np.random.rand(20, 20)
+    coords = np.array([[10.0, 10.0], [-20.0, -20.0]])
 
     assert not np.any(np.isnan(ballet_centroid(im, coords, cnn, nans=False)))
     assert np.any(np.isnan(ballet_centroid(im, coords, cnn, nans=True)))
