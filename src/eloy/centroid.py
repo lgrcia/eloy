@@ -57,7 +57,7 @@ def photutils_centroid(data, coords, cutout=21, centroid_fun=None):
     return centroid_coords
 
 
-def ballet_centroid(data, coords, cnn):
+def ballet_centroid(data, coords, cnn, nans=False):
     """
     Compute centroids for sources using a CNN-based model.
 
@@ -69,6 +69,8 @@ def ballet_centroid(data, coords, cnn):
         Array of (x, y) coordinates for sources.
     cnn : object
         CNN model with a `centroid` method that accepts cutouts.
+    nans : bool, optional
+        If True, NaN values in the output will be replaced with the original coordinates.
 
     Returns
     -------
@@ -76,4 +78,10 @@ def ballet_centroid(data, coords, cnn):
         Array of refined centroid coordinates.
     """
     cutouts = utils.cutout(data, coords, (15, 15), fill_value=np.median(data))
-    return coords - 15 / 2 + cnn.centroid(cutouts)
+    centroids = np.array(coords - 15 / 2 + cnn.centroid(cutouts))
+    if not nans:
+        is_nan = np.isnan(centroids).any(axis=1)
+        centroids[is_nan] = coords[is_nan]
+        return centroids
+    else:
+        return centroids

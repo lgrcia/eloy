@@ -1,6 +1,7 @@
 from eloy import utils, centroid, alignment
 from photutils.centroids import centroid_com
 import numpy as np
+import pytest
 
 
 def test_centroid():
@@ -19,3 +20,17 @@ def test_centroid_out():
     data = np.random.rand(50, 50)
     coords = np.array([[-1, 1], [20, 20]])
     centroid.photutils_centroid(data, coords)
+
+
+def test_ballet_nans():
+    """Test ballet centroid with nans"""
+    pytest.importorskip("jax")
+    from eloy.centroid import ballet_centroid, Ballet
+
+    cnn = Ballet()
+
+    im = np.random.rand(20, 20)
+    coords = np.array([[10.0, 10.0], [-20.0, -20.0]])
+
+    assert not np.any(np.isnan(ballet_centroid(im, coords, cnn, nans=False)))
+    assert np.any(np.isnan(ballet_centroid(im, coords, cnn, nans=True)))
