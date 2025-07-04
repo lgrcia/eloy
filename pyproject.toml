@@ -14,13 +14,13 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-version = "0.0.9b"
+version = "0.0.10b"
 dependencies = [
     "numpy",
     "scikit-image",
     "astropy",
     "photutils",
-    "twirl>=0.4.0",
+    "twirl>=0.4.2",
     "scipy",
 ]
 
