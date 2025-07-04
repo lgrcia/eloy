@@ -24,7 +24,7 @@ def test_centroid_out():
 
 def test_ballet_nans():
     """Test ballet centroid with nans"""
-    pytest.importorskip("eloy.ballet")
+    pytest.importorskip("jax")
     from eloy.centroid import ballet_centroid, Ballet
 
     cnn = Ballet()
