@@ -15,6 +15,7 @@ def test(session):
 def docs(session):
     session.install(".[docs]")
     with session.chdir("docs"):
+        session.run("mkdir", "autoapi", external=True)
         session.run(
             "python",
             "-m",
