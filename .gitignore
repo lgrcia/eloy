@@ -22,3 +22,7 @@ jupyter_execute
 __pycache__
 _docs
 *.f*t*
+*.npz
+*.array
+*.log
+*.mp4

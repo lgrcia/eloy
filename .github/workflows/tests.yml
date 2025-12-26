@@ -38,9 +38,7 @@ jobs:
           python -m pip install -U nox
 
       - name: "Tests: run"
-        run: |
-          python -m nox --non-interactive --error-on-missing-interpreter \
-            --session "${{matrix.session}}-${{matrix.python-version}}"
+        run: python -m nox --non-interactive --session "${{matrix.session}}-${{matrix.python-version}}"
 
   docs-build:
     runs-on: ubuntu-latest

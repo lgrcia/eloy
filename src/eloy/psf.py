@@ -6,6 +6,7 @@ and fitting 2D Gaussian models to image data.
 """
 
 from scipy.optimize import minimize
+from functools import partial
 import numpy as np
 
 gaussian_sigma_to_fwhm = 2.0 * np.sqrt(2.0 * np.log(2.0))
@@ -50,6 +51,31 @@ def moments(data):
     }
 
 
+def gaussian(
+    xs=None,
+    ys=None,
+    amplitude=None,
+    x=None,
+    y=None,
+    sigma_x=None,
+    sigma_y=None,
+    theta=None,
+    background=None,
+    **kwargs,
+):
+    dx = xs - x
+    dy = ys - y
+    a = (np.cos(theta) ** 2) / (2 * sigma_x**2) + (np.sin(theta) ** 2) / (
+        2 * sigma_y**2
+    )
+    b = -(np.sin(2 * theta)) / (4 * sigma_x**2) + (np.sin(2 * theta)) / (4 * sigma_y**2)
+    c = (np.sin(theta) ** 2) / (2 * sigma_x**2) + (np.cos(theta) ** 2) / (
+        2 * sigma_y**2
+    )
+    psf = amplitude * np.exp(-(a * dx**2 + 2 * b * dx * dy + c * dy**2))
+    return psf + background
+
+
 def fit_gaussian(data, init=None):
     """
     Fit a 2D Gaussian to the data.
@@ -68,14 +94,7 @@ def fit_gaussian(data, init=None):
     """
     x, y = np.indices(data.shape)
 
-    def model(height, xo, yo, sx, sy, theta, m):
-        dx = x - xo
-        dy = y - yo
-        a = (np.cos(theta) ** 2) / (2 * sx**2) + (np.sin(theta) ** 2) / (2 * sy**2)
-        b = -(np.sin(2 * theta)) / (4 * sx**2) + (np.sin(2 * theta)) / (4 * sy**2)
-        c = (np.sin(theta) ** 2) / (2 * sx**2) + (np.cos(theta) ** 2) / (2 * sy**2)
-        psf = height * np.exp(-(a * dx**2 + 2 * b * dx * dy + c * dy**2))
-        return psf + m
+    model = partial(gaussian, x, y)
 
     def nll(params):
         ll = np.sum(np.power(model(*params) - data, 2))
@@ -98,4 +117,14 @@ def fit_gaussian(data, init=None):
     ]
 
     opt = minimize(nll, p0, bounds=bounds).x
-    return {k: v for k, v in zip(keys, opt)}
+    result = {k: v for k, v in zip(keys, opt)}
+
+    # Ensure sigma_x is the larger value and sigma_y is the smaller
+    if result["sigma_x"] < result["sigma_y"]:
+        result["sigma_x"], result["sigma_y"] = result["sigma_y"], result["sigma_x"]
+        result["theta"] += np.pi / 2
+
+    # Ensure theta is always positive
+    result["theta"] = result["theta"] % (2 * np.pi)
+
+    return result
