@@ -11,7 +11,7 @@ from astropy.stats import sigma_clipped_stats
 import numpy as np
 
 
-def aperture_photometry(data, coords, radii):
+def aperture_photometry(data, coords, radii, mask=None):
     """
     Perform aperture photometry for a set of coordinates and radii usin photutils.
 
@@ -23,6 +23,8 @@ def aperture_photometry(data, coords, radii):
         Array of (x, y) coordinates.
     radii : array-like
         List of aperture radii.
+    mask : np.ndarray, optional
+        Boolean array where True values indicate pixels to be masked out.
 
     Returns
     -------
@@ -31,14 +33,14 @@ def aperture_photometry(data, coords, radii):
     """
     apertures = [CircularAperture(coords, r=r) for r in radii]
     aperture_fluxes = np.array(
-        [photutils_aperture_photometry(data, a)["aperture_sum"].data for a in apertures]
+        [photutils_aperture_photometry(data, a, mask=mask)["aperture_sum"].data for a in apertures]
     ).T
     return aperture_fluxes
 
 
 def annulus_sigma_clip_median(data, coords, r_in, r_out, sigma=3):
     """
-    Compute the sigma-clipped median background in an annulus around each coordinate 
+    Compute the sigma-clipped median background in an annulus around each coordinate
     using photutils.
 
     Parameters
