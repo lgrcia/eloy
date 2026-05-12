@@ -77,8 +77,17 @@ def ballet_centroid(data, coords, cnn, nans=False):
     np.ndarray
         Array of refined centroid coordinates.
     """
-    cutouts = utils.cutout(data, coords, (15, 15), fill_value=np.median(data))
-    centroids = np.array(coords - 15 / 2 + cnn.centroid(cutouts))
+    cutouts, cutout_objects = utils.cutout(data, coords, (15, 15), fill_value=np.median(data), return_cutouts=True)
+    centroids_cutout_coords = cnn.centroid(cutouts)
+
+    centroids = np.array(
+        [
+            cutout.to_original_position(centroid)
+            for cutout, centroid
+            in zip(cutout_objects, centroids_cutout_coords, strict=True)
+        ]
+    )
+
     if not nans:
         is_nan = np.isnan(centroids).any(axis=1)
         centroids[is_nan] = coords[is_nan]

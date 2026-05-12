@@ -11,7 +11,7 @@ from astropy.nddata import Cutout2D
 from astropy.nddata.utils import NoOverlapError
 
 
-def cutout(data, coords, shape, wcs=None, fill_value=np.nan):
+def cutout(data, coords, shape, wcs=None, fill_value=np.nan, return_cutouts=False):
     """
     Extract cutouts from data at given coordinates.
 
@@ -26,21 +26,40 @@ def cutout(data, coords, shape, wcs=None, fill_value=np.nan):
     wcs : WCS or None, optional
         World Coordinate System object.
 
+    fill_value : scalar, optional
+        Value to use for pixels outside the data when mode='partial'.
+
+    return_cutouts : bool, optional
+        If True, return the cutout objects in addition
+        to the cutout data arrays.
+
     Returns
     -------
     np.ndarray
         Array of cutout images.
+
+    list of Cutout2D, optional
+        List of Cutout2D objects if return_cutouts is True.
     """
     values = []
     dummy = np.zeros(shape, dtype=data.dtype)
-    for coords in coords:
+    cutouts = []
+    for coord in coords:
         try:
             cutout = Cutout2D(
-                data, coords, shape, wcs=wcs, fill_value=fill_value, mode="partial"
+                data, coord, shape, wcs=wcs, fill_value=fill_value, mode="partial"
             )
         except NoOverlapError:
-            cutout = dummy
+            cutout = Cutout2D(dummy, (shape[1] // 2, shape[0] // 2), shape, wcs=wcs, fill_value=fill_value, mode="partial")
+
         values.append(cutout.data)
+
+        if return_cutouts:
+            cutouts.append(cutout)
+
+    if return_cutouts:
+        return np.array(values), cutouts
+
     return np.array(values)
 
 
