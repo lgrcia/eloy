@@ -70,7 +70,7 @@ def ballet_centroid(data, coords, cnn, nans=False):
     cnn : object
         CNN model with a `centroid` method that accepts cutouts.
     nans : bool, optional
-        If True, NaN values in the output will be replaced with the original coordinates.
+        If False, NaN values in the output will be replaced with the original coordinates.
 
     Returns
     -------
