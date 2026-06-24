@@ -43,7 +43,7 @@ def clean_close_coords(coords, min_separation=30):
     return np.array([coords[i] for i in range(len(coords)) if keep[i]])
 
 
-def stars_detection(image, threshold=5, opening=5):
+def stars_detection(image, threshold=5, opening=5, sort_by="peak"):
     """
     Detect stars in an image using thresholding and morphological opening.
 
@@ -55,6 +55,10 @@ def stars_detection(image, threshold=5, opening=5):
         Detection threshold in units of standard deviation above the median.
     opening : int, optional
         Size of the morphological opening kernel.
+    sort_by : str, optional
+        How to sort detected stars. Use "flux" (default) to sort by total
+        integrated flux (intensity_mean * area), suitable for defocused images.
+        Use "peak" to sort by peak pixel value, suitable for focused images.
 
     Returns
     -------
@@ -69,5 +73,8 @@ def stars_detection(image, threshold=5, opening=5):
     regions = regionprops(
         label(binary_opening(image.data > threshold, opening_kernel)), image
     )
-    regions = sorted(regions, key=lambda x: x.intensity_max, reverse=True)
+    if sort_by == "peak":
+        regions = sorted(regions, key=lambda x: x.intensity_max, reverse=True)
+    else:
+        regions = sorted(regions, key=lambda x: x.intensity_mean * x.area, reverse=True)
     return regions
