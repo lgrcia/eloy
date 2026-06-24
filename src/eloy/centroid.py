@@ -13,9 +13,20 @@ import warnings
 from astropy.utils.exceptions import AstropyUserWarning
 import numpy as np
 from eloy import utils
-from eloy.ballet import Ballet
 
 default_centroid_func = centroid_quadratic
+
+
+def _get_ballet():
+    try:
+        from eloy.ballet import Ballet
+        return Ballet
+    except Exception as e:
+        raise ImportError(
+            "Ballet/JAX is not available. Install an ARM-compatible JAX build "
+            "(e.g. 'pip install jax[cpu]' with an ARM Python). "
+            f"Original error: {e}"
+        ) from e
 
 
 def photutils_centroid(data, coords, cutout=21, centroid_fun=None):
